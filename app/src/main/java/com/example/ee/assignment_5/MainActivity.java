@@ -26,7 +26,6 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    //EditText phoneText;
     ImageButton callBtn;
     Spinner spinner;
     String countryCode="";
@@ -41,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         setTitle(R.string.app_title);
 
-      //  phoneText = (EditText) findViewById(R.id.PhoneEditText);
         phoneText1 = (AutoCompleteTextView) findViewById(R.id.PhoneAutoCompleteTextView);
         callBtn = (ImageButton) findViewById(R.id.CallimageButton);
         spinner = (Spinner) findViewById(R.id.countryCodeSpinner);
@@ -115,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void textDirectCall(){
 
-      //  phoneText = (EditText) findViewById(R.id.PhoneEditText);
         phoneText1 = (AutoCompleteTextView) findViewById(R.id.PhoneAutoCompleteTextView);
 
         phoneText1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -151,38 +148,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        /*phoneText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId== EditorInfo.IME_ACTION_GO){
 
-                    if(!permissionGranted){
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setCancelable(false)
-                                .setTitle("Permission Not Granted:")
-                                .setMessage("required for direct call")
-                                .setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
-                                    @TargetApi(Build.VERSION_CODES.M)
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
-                                                CALL_REQUEST);
-
-                                    }
-                                })
-                                .setNegativeButton("NOT NOW",null)
-                                .create()
-                                .show();
-
-                    }
-                    if (permissionGranted){
-                        call();
-                    }
-
-                }
-                return false;
-            }
-        });*/
 
     }
 
