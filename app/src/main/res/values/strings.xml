@@ -2,5 +2,7 @@
     <string name="app_name">ASSIGNMENT-5</string>
     <string name="app_title">DIRECT CALL</string>
     <string name="hint">Mobile No.📱</string>
+    <string name="hint_lollypop">Mobile No.</string>
+
 
 </resources>

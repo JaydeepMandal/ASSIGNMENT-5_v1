@@ -19,19 +19,23 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     ImageButton callBtn;
     Spinner spinner;
-    String countryCode="";
     AutoCompleteTextView phoneText1;
+
+    String countryCode="";
     boolean permissionGranted=false;
     static int CALL_REQUEST = 2;
+
+    ArrayList<String> phoneNumber1 = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +45,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setTitle(R.string.app_title);
 
         phoneText1 = (AutoCompleteTextView) findViewById(R.id.PhoneAutoCompleteTextView);
-        callBtn = (ImageButton) findViewById(R.id.CallimageButton);
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            phoneText1.setHint(R.string.hint);
+        }
+        else{
+            phoneText1.setHint(R.string.hint_lollypop);
+        }
+
+
         spinner = (Spinner) findViewById(R.id.countryCodeSpinner);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(),
-                R.array.code,android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.code,R.layout.phone_no_drop_down);
+        adapter.setDropDownViewResource(R.layout.phone_no_drop_down);
 
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
@@ -85,10 +96,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         else{
             directCall();
         }
+
         if(!permissionGranted){
             directCall();
         }
 
+    }
+
+    public void phoneAdapter(){
+
+        ArrayAdapter<String> phoneNoAdapter = new ArrayAdapter<>(getApplicationContext(),
+                R.layout.phone_no_drop_down,phoneNumber1);
+       // phoneNoAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        phoneText1.setThreshold(1);
+        phoneText1.setAdapter(phoneNoAdapter);
+        phoneText1.setTextColor(Color.BLACK);
 
 
     }
@@ -108,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         buttonDirectCall();
         textDirectCall();
 
-
     }
 
     public void textDirectCall(){
@@ -119,6 +140,51 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId== EditorInfo.IME_ACTION_GO){
+
+                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+
+                        if(!permissionGranted){
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                            builder.setCancelable(false)
+                                    .setTitle("Permission Not Granted:")
+                                    .setMessage("required for direct call")
+                                    .setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
+                                        @TargetApi(Build.VERSION_CODES.M)
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
+                                                    CALL_REQUEST);
+
+                                        }
+                                    })
+                                    .setNegativeButton("NOT NOW",null)
+                                    .create()
+                                    .show();
+
+                        }
+                        if (permissionGranted){
+                            call();
+                        }
+                    }
+                    else {
+                        call();
+                    }
+                }
+                return false;
+            }
+        });
+
+    }
+
+    public void buttonDirectCall(){
+
+        callBtn = (ImageButton) findViewById(R.id.CallimageButton);
+
+        callBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
 
                     if(!permissionGranted){
 
@@ -144,45 +210,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
 
                 }
-                return false;
-            }
-        });
-
-
-
-    }
-
-    public void buttonDirectCall(){
-
-        callBtn = (ImageButton) findViewById(R.id.CallimageButton);
-
-        callBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!permissionGranted){
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setCancelable(false)
-                            .setTitle("Permission Not Granted:")
-                            .setMessage("required for direct call")
-                            .setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
-                                @TargetApi(Build.VERSION_CODES.M)
-                                public void onClick(DialogInterface dialog, int which) {
-                                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
-                                            CALL_REQUEST);
-
-                                }
-                            })
-                            .setNegativeButton("NOT NOW",null)
-                            .create()
-                            .show();
-
-                }
-                if (permissionGranted){
+                else{
                     call();
                 }
-
-
             }
         });
 
@@ -203,6 +233,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         else{
             phoneNo.append(countryCode);
             phoneNo.append(phoneText1.getText().toString());
+            if(!phoneNumber1.contains(phoneText1.getText().toString())){
+                phoneNumber1.add(phoneText1.getText().toString());
+            }
+            phoneText1.setText(null);
+            phoneAdapter();
             Uri uri = Uri.parse("tel:"+phoneNo);
 
             Intent intent = new Intent(Intent.ACTION_CALL,uri);
