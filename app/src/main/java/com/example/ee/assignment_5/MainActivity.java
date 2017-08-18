@@ -139,6 +139,41 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    //method to handle permission request on button click and calling dialer
+    public void permissionRequestOnCall(){
+
+        //the bellow "if" part works on only for android version M and above
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            //request for permission if permission is not granted initially during app startup
+            if(!permissionGranted){
+                //Dialog to tell reason for permission and request permission
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setCancelable(false)
+                        .setTitle("Permission Not Granted:")
+                        .setMessage("required for direct call")
+                        .setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
+                            @TargetApi(Build.VERSION_CODES.M)
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
+                                        CALL_REQUEST);
+
+                            }
+                        })
+                        .setNegativeButton("NOT NOW",null)
+                        .create()
+                        .show();
+
+            }
+            if (permissionGranted){     //permission is granted initially during app startup
+                call();
+            }
+        }
+        //the bellow "else" part works on for android version < android M
+        else {
+            call();
+        }
+    }
+
     //method to call entered phone no. when virtual keyboard button go is clicked
     public void textDirectCall(){
 
@@ -149,36 +184,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId== EditorInfo.IME_ACTION_GO){    //stuff to do when go button is clicked
 
-                    //the bellow "if" part works on only for android version M and above
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-                        //request for permission if permission is not granted initially during app startup
-                        if(!permissionGranted){
-                            //Dialog to tell reason for permission and request permission
-                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                            builder.setCancelable(false)
-                                    .setTitle("Permission Not Granted:")
-                                    .setMessage("required for direct call")
-                                    .setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
-                                        @TargetApi(Build.VERSION_CODES.M)
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
-                                                    CALL_REQUEST);
+                    permissionRequestOnCall();
 
-                                        }
-                                    })
-                                    .setNegativeButton("NOT NOW",null)
-                                    .create()
-                                    .show();
-
-                        }
-                        if (permissionGranted){     //permission is granted initially during app startup
-                            call();
-                        }
-                    }
-                    //the bellow "else" part works on for android version < android M
-                    else {
-                        call();
-                    }
                 }
                 return false;
             }
@@ -195,36 +202,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {   //stuff to do when go button is clicked
 
-                //the bellow "if" part works on only for android version M and above
-                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-                    //request for permission if permission is not granted initially during app startup
-                    if(!permissionGranted){
-                        //Dialog to tell reason for permission and request permission
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setCancelable(false)
-                                .setTitle("Permission Not Granted:")
-                                .setMessage("required for direct call")
-                                .setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
-                                    @TargetApi(Build.VERSION_CODES.M)
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
-                                                CALL_REQUEST);
+                permissionRequestOnCall();
 
-                                    }
-                                })
-                                .setNegativeButton("NOT NOW",null)
-                                .create()
-                                .show();
-
-                    }
-                    if (permissionGranted){     //permission is granted initially during app startup
-                        call();
-                    }
-                }
-                //the bellow "else" part works on for android version < android M
-                else{
-                    call();
-                }
             }
         });
 
